@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-{{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: worker
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      release: "{{ .Release.Name }}"
+      component: worker
+  template:
+    metadata:
+      {{- if .Values.prometheus.scrape }}
+      annotations:
+        prometheus.io/scrape: true
+        prometheus.io/port: 8002
+      {{- end }}
+      labels:
+        app: {{ template "name" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+        component: worker
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+      containers:
+        - name: worker-{{ template "name" . }}
+          image: {{ .Values.image.worker.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+{{ toYaml .Values.worker.resources | trim | indent 12 }}
+          ports:
+            - containerPort: {{ .Values.worker.app.service.port }}
+              name: http
+            - containerPort: {{ .Values.worker.app.service.metricsPort }}
+              name: metrics
+          {{- if .Values.worker.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /status/health_check
+              port: http
+            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.worker.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.worker.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /status/readiness_check
+              port: http
+            initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.worker.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
+          {{- end }}
+          env:
+            - name: REDIRECTORY_CONFIG_DIR
+              value: "/redirectory_config"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          volumeMounts:
+            - name: worker-configuration
+              mountPath: /redirectory_config
+      serviceAccountName: {{ template "fullname" . }}
+      volumes:
+        - name: worker-configuration
+          configMap:
+            name: worker-{{ template "fullname" . }}

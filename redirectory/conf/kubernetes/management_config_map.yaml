@@ -1,0 +1,27 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: redirectory-management
+  namespace: redirectory
+data:
+  config.yaml: |
+    deployment: prod
+    log_level: debug
+    node_type: management
+    directories:
+      data: /redirectory_data
+      ui: /redirectory_ui
+    service:
+      ip: 0.0.0.0
+      port: 8001
+      metrics_port: 8002
+    database:
+      type: sqlite
+      path: redirectory_sqlite.db
+    hyperscan:
+      domain_db: hs_compiled_domain.hsd
+      rules_db: hs_compiled_rules.hsd
+    kubernetes:
+      namespace: redirectory
+      worker_selector: app=redirectory-worker
+      management_selector: app=redirectory-management

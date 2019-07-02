@@ -1,0 +1,141 @@
+## This variable overrides the auto generated name given by HELM
+# nameOverride: 'redirectory'
+
+## All settings for the image
+image:
+  ## The tag is the same for both the management and the worker due to the fact
+  ## they need to be the same version in order to work together
+  tag: latest
+  ## Which secret should be used to pull the images from the repository
+  pullSecret: kumina-registry
+  ## The pull policy for the image. Usually it is always in order to get the most up to date version
+  pullPolicy: Always
+  management:
+    repository: registry.kumina.nl/kumina/redirectory-management
+  worker:
+    repository: registry.kumina.nl/kumina/redirectory-worker
+
+## All the settings needed to configure the behaviour of the management pod
+management:
+  ## Resources for the management pod
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "300Mi"
+      cpu: "300m"
+  ## App settings
+  app:
+    ## In what state is the application going to be running
+    deployment: prod
+    ## The log level you would like to be outputted to std out
+    logLevel: debug
+    ## The directories where the application is going to expect the data for the DB and the UI
+    directories:
+      data: /redirectory_data
+      ui: /redirectory_ui
+    ## Setting on which ip and port the application should run
+    service:
+      ip: 0.0.0.0
+      port: 8001
+      metricsPort: 8002
+    ## The name of the DB file located in the data folder
+    database:
+      path: redirectory_sqlite.db
+    ## The names of the Hyperscan DB files located in the data folder
+    hyperscan:
+      domainDb: hs_compiled_domain.hsd
+      rulesDb: hs_compiled_rules.hsd
+  ## Settings that control the name and the size of the persistent
+  ## volume that the management pod is going to use
+  persistentVolumeClaim:
+    name: 'redirectory-management'
+    size: '1Gi'
+    storageClassName: 'standard'
+  ## Settings for the ingress resource for the management pod
+  ingress:
+    ## On which host should the UI be visible
+    host: redirectory.kumina.nl
+    ## On which path of the host should the UI be visible
+    path: /
+  ## Configure extra options for liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+worker:
+  ## Number of replicas for the worker deployment
+  replicas: 3
+  ## Resources for all worker pods
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "300Mi"
+      cpu: "300m"
+  ## App settings
+  app:
+    ## In what state is the application going to be running
+    deployment: prod
+    ## The log level you would like to be outputted to std out
+    logLevel: debug
+    ## The directories where the application is going to expect the data for the DB and the UI
+    directories:
+      data: /redirectory_data
+      ui: /redirectory_ui
+    ## Setting on which ip and port the application should run
+    service:
+      ip: 0.0.0.0
+      port: 8001
+      metricsPort: 8002
+    ## The name of the DB file located in the data folder
+    database:
+      path: redirectory_sqlite.db
+    ## The names of the Hyperscan DB files located in the data folder
+    hyperscan:
+      domainDb: hs_compiled_domain.hsd
+      rulesDb: hs_compiled_rules.hsd
+  ## Configure extra options for liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+
+## Needed settings to configure prometheus to spider the metrics from
+## the management and the worker pods
+prometheus:
+  scrape: false
+  operator:
+    enabled: true
+    ## Namespace where the service monitors should be created
+    namespace: infra
+    serviceMonitor:
+      ## Interval at which Prometheus scrapes the metrics from the pods
+      interval: 30s
+      selector:
+        prometheus: prom

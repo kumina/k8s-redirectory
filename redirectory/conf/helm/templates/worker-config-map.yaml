@@ -1,0 +1,34 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: worker-{{ template "fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: worker
+data:
+  config.yaml: |
+    deployment: {{ .Values.worker.app.deployment }}
+    log_level: {{ .Values.worker.app.logLevel }}
+    node_type: worker
+    directories:
+      data: {{ .Values.worker.app.directories.data }}
+      ui: {{ .Values.worker.app.directories.ui }}
+    service:
+      ip: {{ .Values.worker.app.service.ip }}
+      port: {{ .Values.worker.app.service.port }}
+      metrics_port: {{ .Values.worker.app.service.metricsPort }}
+    database:
+      type: sqlite
+      path: {{ .Values.worker.app.database.path }}
+    hyperscan:
+      domain_db: {{ .Values.worker.app.hyperscan.domainDb }}
+      rules_db: {{ .Values.worker.app.hyperscan.rulesDb }}
+    kubernetes:
+      namespace: {{ .Release.Namespace }}
+      worker_selector: "app={{ template "name" . }}, release={{ .Release.Name }}, component=worker"
+      management_selector: "app={{ template "name" . }}, release={{ .Release.Name }}, component=management"
+

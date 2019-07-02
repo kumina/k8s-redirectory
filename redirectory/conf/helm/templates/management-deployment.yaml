@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: management-{{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: management
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      release: "{{ .Release.Name }}"
+      component: management
+  template:
+    metadata:
+      {{- if .Values.prometheus.scrape }}
+      annotations:
+        prometheus.io/scrape: true
+        prometheus.io/port: 8002
+      {{- end }}
+      labels:
+        app: {{ template "name" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+        component: management
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+      containers:
+        - name: management-{{ template "name" . }}
+          image: {{ .Values.image.management.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+{{ toYaml .Values.management.resources | trim | indent 12 }}
+          ports:
+            - containerPort: {{ .Values.management.app.service.port }}
+              name: http
+            - containerPort: {{ .Values.management.app.service.metricsPort }}
+              name: metrics
+          {{- if .Values.management.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /status/health_check
+              port: http
+            initialDelaySeconds: {{ .Values.management.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.management.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.management.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.management.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.management.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.management.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /status/readiness_check
+              port: http
+            initialDelaySeconds: {{ .Values.management.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.management.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.management.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.management.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.management.readinessProbe.failureThreshold }}
+          {{- end }}
+          env:
+            - name: REDIRECTORY_CONFIG_DIR
+              value: "/redirectory_config"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          volumeMounts:
+            - name: management-configuration
+              mountPath: /redirectory_config
+            - name: management-redirectory
+              mountPath: /redirectory_data
+      serviceAccountName: {{ template "fullname" . }}
+      volumes:
+        - name: management-configuration
+          configMap:
+            name: management-{{ template "fullname" . }}
+        - name: management-redirectory
+          persistentVolumeClaim:
+            claimName: {{ .Values.management.persistentVolumeClaim.name }}
+

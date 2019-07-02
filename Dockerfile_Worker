@@ -1,0 +1,26 @@
+# FROM python-3-stretch-hyperscan:latest
+FROM registry.kumina.nl/kumina/redirectory-hyperscan:latest
+
+# Install something for sqlalchemy
+RUN apt-get update && \
+    apt-get install -y default-libmysqlclient-dev
+
+# Create work directory and copy the project
+WORKDIR /redirectory
+COPY . .
+
+# Data folder for the application
+RUN mkdir /redirectory_data && \
+    mkdir /redirectory_config
+
+# Install all needed dependencies
+RUN pip3 install --upgrade pip && \
+    pip3 install -r requirements.txt
+
+# Expose normal port
+EXPOSE 8001
+# Expose metrics port
+EXPOSE 8002
+
+# Run
+CMD ["python3", "-m", "redirectory"]

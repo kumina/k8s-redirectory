@@ -1,0 +1,27 @@
+{{- if .Values.prometheus.operator.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: management
+{{ toYaml .Values.prometheus.operator.serviceMonitor.selector | trim | indent 4 }}
+  name: management-{{ template "fullname" . }}
+  namespace: {{ .Values.prometheus.operator.namespace }}
+spec:
+  endpoints:
+  - interval: {{ .Values.prometheus.operator.serviceMonitor.interval }}
+    port: metrics-port
+  jobLabel: app
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
+      release: "{{ .Release.Name }}"
+      component: management
+{{- end }}
+

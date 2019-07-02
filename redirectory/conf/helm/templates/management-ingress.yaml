@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: management-{{ template "fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: management
+#  annotations:
+#    kubernetes.io/ingress.class: traefik
+#    traefik.ingress.kubernetes.io/auth-type: "basic"
+#    traefik.ingress.kubernetes.io/auth-secret: "redirectory-login"
+spec:
+  rules:
+    - host: {{ .Values.management.ingress.host }}
+      http:
+        paths:
+          - path: {{ .Values.management.ingress.path }}
+            backend:
+              serviceName: management-{{ template "fullname" . }}
+              servicePort: management-port

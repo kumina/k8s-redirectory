@@ -1,0 +1,8 @@
+name: redirectory
+keywords:
+  - redirect
+  - rules
+version: v0.0.1
+appVersion: v0.0.1
+description: An application that redirects requests that would usually end in 404 based on given rules
+engine: gotpl

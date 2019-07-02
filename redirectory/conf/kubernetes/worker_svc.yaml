@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redirectory-worker
+  labels:
+    app: redirectory
+    component: worker
+spec:
+  selector:
+    app: redirectory-worker
+  ports:
+    - port: 8001
+      targetPort: 8001
+      name: worker-port
+#     BUG
+#    - port: 8002
+#      targetPort: 8002
+#      name: metrics-port

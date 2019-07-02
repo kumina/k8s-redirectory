@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-{{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component: worker
+spec:
+  selector:
+    app: {{ template "name" . }}
+    release: "{{ .Release.Name }}"
+    component: worker
+  ports:
+    - name: metrics-port
+      port: {{ .Values.worker.app.service.metricsPort }}
+      targetPort: {{ .Values.worker.app.service.metricsPort }}
+    - name: worker-port
+      port: {{ .Values.worker.app.service.port }}
+      targetPort: {{ .Values.worker.app.service.port }}

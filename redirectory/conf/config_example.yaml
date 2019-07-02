@@ -1,0 +1,25 @@
+deployment: prod
+node_type: worker # options ['worker', 'management', 'job']
+log_level: debug # options ['debug', 'info', 'warning', 'error', 'critical']
+directories:
+  data: /home/ivaylo/kumina/redirectory_data
+  ui: /home/ivaylo/kumina/redirectory_ui
+service:
+  ip: 0.0.0.0
+  port: 8001
+  metrics_port: 8002
+database:
+  type: sqlite # options ['sqlite', 'mysql']
+  path: redirectory_sqlite.db # If sqlite - default: redirectory_sqlite.db
+  host: 0.0.0.0 # If mysql - default: localhost
+  port: 7001 # If mysql - default: 3306
+  name: db_red # If mysql - default: redirectory
+  username: python_user # If mysql - default: user
+  password: python_pass # If mysql - default: pass
+hyperscan:
+  domain_db: hs_compiled_domain.hsd # default: hs_compiled_domain.hsd
+  rules_db: hs_compiled_rules.hsd # default: hs_compiled_rules.hsd
+kubernetes:
+  namespace: redirectory # default: redirectory
+  worker_selector: app=redirectory-worker # default: app=redirectory-worker
+  management_selector: app=redirectory-management # default: app=redirectory-management

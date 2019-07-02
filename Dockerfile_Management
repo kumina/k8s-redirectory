@@ -1,0 +1,60 @@
+# Build UI stage
+# redirectory-hyperscan
+# -----------
+# FROM python-3-stretch-hyperscan:latest as management_ui_builder
+FROM registry.kumina.nl/kumina/redirectory-hyperscan:latest as management_ui_builder
+
+# Set a few vars to help later on
+ENV WORKDIR=/redirectory-ui-build
+ENV FRONTENDDIR=$WORKDIR/frontend
+ENV BUILDDIR=$WORKDIR/frontend/dist/spa
+
+# Update packages and install needed dependacies to build the UI
+RUN apt-get update
+
+# Install Node JS and NPM
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get install -y nodejs
+
+# Set workdir and copy the project
+WORKDIR $WORKDIR
+COPY . .
+
+RUN cd $FRONTENDDIR && \
+    npm install && \
+    npm install -g @quasar/cli  && \
+    quasar build
+
+# Real stage
+# ----------
+# FROM python-3-stretch-hyperscan:latest
+FROM registry.kumina.nl/kumina/redirectory-hyperscan:latest
+
+# Create work directory and copy the project
+WORKDIR /redirectory
+
+# Data and UI folders for the application
+RUN mkdir /redirectory_data && \
+    mkdir /redirectory_ui && \
+    mkdir /redirectory_config
+
+# Install something for sqlalchemy
+RUN apt-get update && \
+    apt-get install -y default-libmysqlclient-dev
+
+COPY . .
+
+# Install all needed dependencies
+RUN pip3 install --upgrade pip && \
+    pip3 install -r requirements.txt
+
+# Copy UI from ui build stage
+COPY --from=management_ui_builder /redirectory-ui-build/frontend/dist/spa /redirectory_ui
+
+# Expose normal port
+EXPOSE 8001
+# Expose metrics port
+EXPOSE 8002
+
+# Run
+CMD ["python3", "-m", "redirectory"]
