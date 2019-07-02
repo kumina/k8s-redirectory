@@ -2,8 +2,8 @@ deployment: prod
 node_type: worker # options ['worker', 'management', 'job']
 log_level: debug # options ['debug', 'info', 'warning', 'error', 'critical']
 directories:
-  data: /home/ivaylo/kumina/redirectory_data
-  ui: /home/ivaylo/kumina/redirectory_ui
+  data: /home/user/redirectory_data
+  ui: /home/user/redirectory_ui
 service:
   ip: 0.0.0.0
   port: 8001
