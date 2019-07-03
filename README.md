@@ -1,6 +1,4 @@
-# Redirectory
-
-<img align="right" height="215" width="510" src="https://github.com/kumina/k8s-redirectory/blob/master/documentation/_static/redirectory_logo.png">
+<img align="left" height="107" width="255" src="https://github.com/kumina/k8s-redirectory/blob/master/documentation/_static/redirectory_logo.png">
 
 Redirectory is a tool that manages redirects on a cluster level.
 Requests that would usually end in a **404 PAGE NOT FOUND** can now
