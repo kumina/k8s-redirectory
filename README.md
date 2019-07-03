@@ -1,13 +1,13 @@
 <img align="left" height="96" width="229" src="https://github.com/kumina/k8s-redirectory/blob/master/documentation/_static/redirectory_logo.png">
 
-Redirectory is a tool that manages redirects on a cluster level.
-Requests that would usually end in a **404 PAGE NOT FOUND** can now
-redirect to new pages specified with custom rules. It binds itself as
+Redirectory is a tool that manages redirects on a kubernetes cluster.
+Requests that would usually end in a **404 PAGE NOT FOUND** can now be
+redirected to new pages specified with custom rules. It binds itself as
 the default backend (essential a wild card) of your ingress controller
 and catches all the request that the cluster can't find an ingress rule
 for. After that with the help of the
 [Hyperscan](https://www.hyperscan.io) regex engine the request is
-pernamenty redirected to the new destination from the rules. If there is
+permanently redirected to the new destination based on the rules. If there is
 no rule that matches the request you can specify a default redirecting
 destination.
 
