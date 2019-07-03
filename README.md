@@ -26,11 +26,13 @@ other two images.
 
 ## Hyperscan image
 Before we can use Redirectory you must have the Hyperscan library
-installed. Here is a link to the [getting started] documentation. But we
-also have prepaired a Docker image. You can find the `Dockerfile` in:
-`redirectory/conf/hyperscan-docker` and run the `./build.sh` file. The
-interaction between Python and Hyperscan is made with
-[python-hyperscan](https://github.com/darvid/python-hyperscan). 
+installed. Here is a link to the
+[getting started](https://github.com/intel/hyperscan/blob/master/doc/dev-reference/getting_started.rst)
+documentation. But we also have prepaired a Docker image. You can find
+the `Dockerfile` in: `redirectory/conf/hyperscan-docker` and run the
+`./build.sh` file. The interaction between Python and Hyperscan is made
+with this awesome library
+[python-hyperscan](https://github.com/darvid/python-hyperscan).
 
 ## Redirectory images
 There are two images. One for the management pod and one for the worker
