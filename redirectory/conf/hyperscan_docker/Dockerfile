@@ -1,6 +1,6 @@
 # Build stage
 # -----------
-FROM registry.kumina.nl/kumina/debian-python:3.7 as hyperscan_builder
+FROM python:3.7-stretch as hyperscan_builder
 
 # Set a few vars to help later on
 ENV WORKDIR=/hyperscan
@@ -41,7 +41,7 @@ RUN strip -d $HS_FINAL_BUILD/libhs.a && \
 
 # Real stage
 # ----------
-FROM registry.kumina.nl/kumina/debian-python:3.7
+FROM python:3.7-stretch
 
 # Set a few vars to help later on
 ENV HS_FINAL_BUILD=/hyperscan/build

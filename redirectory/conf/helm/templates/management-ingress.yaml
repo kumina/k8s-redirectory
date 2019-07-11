@@ -9,10 +9,6 @@ metadata:
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
     component: management
-#  annotations:
-#    kubernetes.io/ingress.class: traefik
-#    traefik.ingress.kubernetes.io/auth-type: "basic"
-#    traefik.ingress.kubernetes.io/auth-secret: "redirectory-login"
 spec:
   rules:
     - host: {{ .Values.management.ingress.host }}

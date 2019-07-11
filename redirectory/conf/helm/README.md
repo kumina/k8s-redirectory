@@ -55,14 +55,15 @@ chart and their default values.
 | Parameter                                                 | Description                                                                                                    | Default                                              |
 |-----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------------------|
 | `image.tag`                                               | Redirectory Image tag                                                                                          | `latest`                                             |
-| `image.pullSecret`                                        | Specify docker-registry secret names as an array                                                               | `kumina-registry`                                    |
+| `image.pullSecret`                                        | Specify docker-registry secret names as an array                                                               | `none`                                               |
+| `image.pullSecretNeeded`                                  | Say if the secret needs to be used or not                                                                      | `false`                                              |
 | `image.pullPolicy`                                        | Image pull policy                                                                                              | `Always`                                             |
 | `image.management.repository`                             | The registry and path to the image for the Management pod                                                      | `registry.kumina.nl/kumina/redirectory-management`   |
 | `image.worker.repository`                                 | The registry and path to the image for the Worker pod                                                          | `registry.kumina.nl/kumina/redirectory-worker`       |
 | `management.persistentVolumeClaim.name`                   | The name of the persistent volume for the Management pod                                                       | `redirectory-management`                             |
 | `management.persistentVolumeClaim.size`                   | The size of the persistent volume for the Management pod                                                       | `1Gi`                                                |
 | `management.persistentVolumeClaim.storageClassName`       | The type of storage class to use for the persistent volume of the Management pod                               | `standard`                                           |
-| `management.ingress.host`                                 | On which host should the Management UI be visible                                                              | `redirectory.kumina.nl`                              |
+| `management.ingress.host`                                 | On which host should the Management UI be visible                                                              | `redirectory.test.com`                               |
 | `management.ingress.path`                                 | Which path for that host should the UI be visible                                                              | `/`                                                  |
 | `management.resources`                                    | Resources needed for the management pod                                                                        | `yaml - take a look at values.yaml`                  |
 | `worker.replicas`                                         | How many workers should serve redirecting requests                                                             | `3`                                                  |
@@ -98,14 +99,14 @@ Redirectory uses in order to configure itself.
 
 | Parameter                         | Description                                                                                                    | Default                                              |
 |-----------------------------------|----------------------------------------------------------------------------------------------------------------|------------------------------------------------------|
-| `app.deployment`                  | Tells Redirectory in what environment it is running. (`prod`, `dev`, `test`)                                    | `prod`                                               |
+| `app.deployment`                  | Tells Redirectory in what environment it is running. (`prod`, `dev`, `test`)                                   | `prod`                                               |
 | `app.loglevel`                    | The level of logs that will be logged to stdout. (`debug`, `info`, `warning`, `error`, `critical`)             | `info`                                               |
 | `app.directories.data`            | The directory where Redirectory expects to find the database                                                   | `/redirectory_data`                                  |
 | `app.directories.ui`              | The directory where Redirectory expects to find the UI                                                         | `/redirectory_ui`                                    |
-| `app.service.ip`                  | IP the application should listen on                                                                  | `0.0.0.0`                                            |
-| `app.service.port`                | Port the application should listen on for normal HTTP requests                                           | `8001`                                               |
-| `app.service.metricsPort`         | Port the Prometheus metrics should be exposed on                                                         | `8002`                                               |
-| `app.database.path`               | The path to the DB file including its name. Appended after the `directories.data`                             | `redirectory_sqlite.db`                              |
+| `app.service.ip`                  | IP the application should listen on                                                                            | `0.0.0.0`                                            |
+| `app.service.port`                | Port the application should listen on for normal HTTP requests                                                 | `8001`                                               |
+| `app.service.metricsPort`         | Port the Prometheus metrics should be exposed on                                                               | `8002`                                               |
+| `app.database.path`               | The path to the DB file including its name. Appended after the `directories.data`                              | `redirectory_sqlite.db`                              |
 | `app.hyperscan.domainDb`          | The path to the Hyperscan DB file that stores the Domains. Appended after the `directories.data`               | `hs_compiled_domain.hsd`                             |
 | `app.hyperscan.rulesDb`           | The path to the Hyperscan DB file that stores the Redirect Rules. Appended after the `directories.data`        | `hs_compiled_rules.hsd`                              |
 

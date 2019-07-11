@@ -35,6 +35,12 @@ class Synchronizer:
 
     @staticmethod
     def management_get_sync_files() -> zipfile.ZipFile:
+        """
+        Function used to get the zip file with the databases from the management pod
+
+        Returns:
+            the databases zipped
+        """
         management_pod: ManagementPod = K8sManager().get_management_pod()
         return management_pod.get_sync_zip_file()
 
@@ -70,6 +76,12 @@ class Synchronizer:
         return worker.sync()
 
     def worker_sync_files(self):
+        """
+        This function gets called when the application is in worker mode.
+        Stops the readiness checks from succeeding.
+        Downloads and reloads the databases.
+        After that it logs a couple of metrics and also logging.
+        """
         Logger() \
             .event(category="synchronizer", action="synchronizer sync started") \
             .out(severity=Severity.INFO)
@@ -106,7 +118,9 @@ class Synchronizer:
         This function is passed as an event callback function to the CompilerJob.
         When the CompilerJob is done with compiling and saving the Hyperscan databases
         if specified it can call this function.
-        # TODO: Trigger worker update
+
+        The function updates some prometheus metrics and updates both the management pod
+        and the worker pods.
 
         Args:
             new_version: the new version of the just compiled db
@@ -135,6 +149,15 @@ class Synchronizer:
                 dataset=f"triggered worker updates for new hs db version: {new_version}"
             ).out(severity=Severity.INFO)
             self.management_update_workers(workers)
+
+        # Trigger management update
+        management = K8sManager().get_management_pod()
+        if management and management.reload_hs_db():
+            Logger().event(
+                category="synchronizer",
+                action="synchronizer management update",
+                dataset=f"triggered management update for new hs db version: {new_version}"
+            ).out(severity=Severity.INFO)
 
     def util_get_sync_files_as_zip(self):
         """

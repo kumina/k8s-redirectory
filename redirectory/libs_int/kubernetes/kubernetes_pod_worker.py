@@ -15,7 +15,14 @@ class WorkerPod(Pod):
         super().__init__(name, ip, port)
 
     def get_data(self) -> dict:
-        data = {
+        """
+        Gathers all of the data about the worker pod into a dict mainly
+        for the user interface
+
+        Returns:
+            dictionary later to be converted to json
+        """
+        return {
             "pod": {
                 "name": self.name,
                 "ip": self.ip,
@@ -30,9 +37,15 @@ class WorkerPod(Pod):
                 "db_version": self.get_hyperscan_db_version()
             }
         }
-        return data
 
     def get_hyperscan_db_version(self) -> Optional[str]:
+        """
+        Sends a request to the worker pod and gets the version of the hs db
+        that is loaded on it
+
+        Returns:
+            the version of the hs db or None
+        """
         try:
             url = f"http://{self.ip}:{self.port}{WORKER_HS_DB_VERSION_ENDPOINT}"
             response = requests.get(url)
@@ -43,6 +56,12 @@ class WorkerPod(Pod):
             return None
 
     def sync(self) -> bool:
+        """
+        Sends a request to the worker pod to reload it's hs db
+
+        Returns:
+            if it reloaded the database or not
+        """
         try:
             url = f"http://{self.ip}:{self.port}{WORKER_RELOAD_HS_DB_ENDPOINT}"
             response = requests.get(url)

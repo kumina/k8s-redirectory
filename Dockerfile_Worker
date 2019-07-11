@@ -1,5 +1,4 @@
-# FROM python-3-stretch-hyperscan:latest
-FROM registry.kumina.nl/kumina/redirectory-hyperscan:latest
+FROM redirectory_hyperscan_base:latest
 
 # Install something for sqlalchemy
 RUN apt-get update && \

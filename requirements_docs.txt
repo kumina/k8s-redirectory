@@ -18,7 +18,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 jsonschema==2.6.0
 kubernetes==9.0.0
-http://artifacts.kumina.nl/python/kubi_ecs_logger-0.0.5.tar.gz
+kubi-ecs-logger==0.0.5
 MarkupSafe==1.1.0
 marshmallow==2.19.2
 mysqlclient==1.4.2.post1

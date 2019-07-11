@@ -33,4 +33,4 @@ SQLAlchemy-Utils==0.33.11
 urllib3==1.25.2
 websocket-client==0.56.0
 Werkzeug==0.14.1
-http://artifacts.kumina.nl/python/kubi_ecs_logger-0.0.5.tar.gz
+kubi-ecs-logger==0.0.5

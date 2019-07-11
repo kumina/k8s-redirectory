@@ -13,6 +13,8 @@ MANAGEMENT_SYNC_DOWNLOAD_ENDPOINT = "/management/sync/download"
 """The endpoint for downloading all needed files to sync workers"""
 MANAGEMENT_ADD_AMBIGUOUS = "/management/ambiguous/add"
 """The endpoint for adding an ambiguous request to the management pod db"""
+MANAGEMENT_RELOAD_HS_DB = "/management/database/reload_management"
+"""The endpoint for reloading the management pod hs DB for testing and from compiler job"""
 
 
 class ManagementPod(Pod):
@@ -21,7 +23,14 @@ class ManagementPod(Pod):
         super().__init__(name, ip, port)
 
     def get_data(self) -> dict:
-        data = {
+        """
+        Gathers all of the data about the management pod into a dict mainly
+        for the user interface
+
+        Returns:
+            dictionary later to be converted to json
+        """
+        return {
             "pod": {
                 "name": self.name,
                 "ip": self.ip,
@@ -36,7 +45,6 @@ class ManagementPod(Pod):
                 "db_version": self.get_hyperscan_db_version()
             }
         }
-        return data
 
     def get_hyperscan_db_version(self) -> dict:
         """
@@ -59,6 +67,13 @@ class ManagementPod(Pod):
             return {}
 
     def get_sync_zip_file(self) -> Optional[zipfile.ZipFile]:
+        """
+        Makes a request to the management pod which downloads the zip file that contains
+        the sql database and the two hyperscan databases. Then converts it to a in memory zip file.
+
+        Returns:
+            zipfile object or None if something goes wrong
+        """
         try:
             url = f"http://{self.ip}:{self.port}{MANAGEMENT_SYNC_DOWNLOAD_ENDPOINT}"
             response = requests.get(url)
@@ -68,12 +83,35 @@ class ManagementPod(Pod):
             return None
 
     def add_ambiguous_request(self, request_url) -> bool:
+        """
+        Sends a request to the management pod to add a new ambiguous request entry
+
+        Args:
+            request_url: the url for the entry ambiguous request entry itself
+
+        Returns:
+            if it added the entry or not
+        """
         try:
             url = f"http://{self.ip}:{self.port}{MANAGEMENT_ADD_AMBIGUOUS}"
             post_data = {
                 "request": request_url
             }
-            requests.post(url, json=post_data)
-            return True
+            response = requests.post(url, json=post_data)
+            return response.status_code == 200
+        except ConnectionError:
+            return False
+
+    def reload_hs_db(self) -> bool:
+        """
+        Sends a request to the management pod to reload it's hs db
+
+        Returns:
+            if it reloaded the database or not
+        """
+        try:
+            url = f"http://{self.ip}:{self.port}{MANAGEMENT_RELOAD_HS_DB}"
+            response = requests.get(url)
+            return response.status_code == 200
         except ConnectionError:
             return False

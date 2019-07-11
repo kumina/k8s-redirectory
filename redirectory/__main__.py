@@ -48,9 +48,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # STOPPED USING RE LOADER
-    # import sys
-    # import os
-    # Fix path because of Flask dev server reloaded is not able to find module redirectory
-    # sys.path.append(os.getcwd())
     main()

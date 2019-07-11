@@ -6,14 +6,16 @@ image:
   ## The tag is the same for both the management and the worker due to the fact
   ## they need to be the same version in order to work together
   tag: latest
-  ## Which secret should be used to pull the images from the repository
-  pullSecret: kumina-registry
+  ## Which secret should be used to pull the images from the repository. PUT YOU SECRET HERE
+  pullSecret: none
+  ## If it needs to use a pull secret or not
+  pullSecretNeeded: false
   ## The pull policy for the image. Usually it is always in order to get the most up to date version
   pullPolicy: Always
   management:
-    repository: registry.kumina.nl/kumina/redirectory-management
+    repository: redirectory_management
   worker:
-    repository: registry.kumina.nl/kumina/redirectory-worker
+    repository: redirectory_worker
 
 ## All the settings needed to configure the behaviour of the management pod
 management:
