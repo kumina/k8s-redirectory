@@ -29,8 +29,10 @@ spec:
         heritage: "{{ .Release.Service }}"
         component: worker
     spec:
+      {{- if .Values.image.pullSecretNeeded }}
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
+      {{- end }}
       containers:
         - name: worker-{{ template "name" . }}
           image: {{ .Values.image.worker.repository }}:{{ .Values.image.tag }}

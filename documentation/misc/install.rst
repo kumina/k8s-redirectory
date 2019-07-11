@@ -50,10 +50,15 @@ manager for Kubernetes but more like a templating engine for Kubernetes **.yaml*
 If you are not familiar with HELM please take a look at theirs documentation on how to use it:
 `HELM docs <https://helm.sh/docs/>`_
 
-Before continuing make sure you have HELM installed on your kubernetes cluster.
+.. warning::
+
+    Before continuing make sure you have HELM installed on your kubernetes cluster.
+    Also make sure you have the Docker images available
 
 Install
 ^^^^^^^
+
+
 Install Redirectory and creates all the needed resources for it from scratch.
 
 .. code-block:: bash

@@ -1,7 +1,6 @@
 # Build UI stage
 # redirectory-hyperscan
 # -----------
-# FROM python-3-stretch-hyperscan:latest as management_ui_builder
 FROM redirectory_hyperscan_base:latest as management_ui_builder
 
 # Set a few vars to help later on
@@ -27,7 +26,6 @@ RUN cd $FRONTENDDIR && \
 
 # Real stage
 # ----------
-# FROM python-3-stretch-hyperscan:latest
 FROM redirectory_hyperscan_base:latest
 
 # Create work directory and copy the project

@@ -42,6 +42,7 @@ This part of the documentation will show you how to get started using Redirector
    misc/install
    misc/kubernetes
    misc/testing
+   misc/docs
    misc/license
 
 API Reference

@@ -28,8 +28,10 @@ spec:
         heritage: "{{ .Release.Service }}"
         component: management
     spec:
+      {{- if .Values.image.pullSecretNeeded }}
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
+      {{- end }}
       containers:
         - name: management-{{ template "name" . }}
           image: {{ .Values.image.management.repository }}:{{ .Values.image.tag }}
