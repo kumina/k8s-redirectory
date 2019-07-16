@@ -92,8 +92,8 @@ export default {
   created () {
     this.load_data()
 
-    this.timer_update_data = setInterval(this.load_data, this.timer_refresh_period)
-    this.timer_refresh_ago = setInterval(this.update_refresh_time, 500)
+    // this.timer_update_data = setInterval(this.load_data, this.timer_refresh_period)
+    // this.timer_refresh_ago = setInterval(this.update_refresh_time, 500)
   },
   beforeDestroy () {
     clearInterval(this.timer_update_data)

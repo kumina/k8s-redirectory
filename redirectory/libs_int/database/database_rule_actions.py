@@ -63,6 +63,7 @@ def add_redirect_rule(db_session, domain: str, domain_is_regex: bool, path: str,
             .event(category="database", action="rule added") \
             .log(original=f"Rule already exists") \
             .out(severity=Severity.DEBUG)
+        db_session.rollback()
         return None
 
 
