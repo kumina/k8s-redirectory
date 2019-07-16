@@ -59,8 +59,9 @@ class HsDatabase:
     def compile_db_in_memory(expressions: List[bytes], ids: List[int]) -> hs.Database:
         assert len(expressions) == len(ids), "There must be an id for every expression."
 
-        flags = [hs.HS_FLAG_SOM_LEFTMOST] * len(expressions)
+        flags = [hs.HS_FLAG_SOM_LEFTMOST, hs.HS_FLAG_ALLOWEMPTY] * len(expressions)
         db = hs.Database(mode=HYPERSCAN_DB_MODE)
+        print(expressions)
         db.compile(expressions=expressions, ids=ids, flags=flags)
         return db
 

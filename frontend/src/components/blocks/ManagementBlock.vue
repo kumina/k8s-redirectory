@@ -41,23 +41,23 @@
           </q-item-label>
         </div>
 
-        <div class="col-2">
-          <q-item-label caption>HS DB OLD VERSION</q-item-label>
-          <q-item-label class="text-black">
-            <div v-if="managementData.hyperscan.db_version.old_version !== null" class="text-positive text-bold">
-              {{ managementData.hyperscan.db_version.old_version }}
-            </div>
-            <div v-else class="text-negative text-bold">
-              UNKNOWN
-            </div>
-          </q-item-label>
-        </div>
+<!--        <div class="col-2">-->
+<!--          <q-item-label caption>HS DB OLD VERSION</q-item-label>-->
+<!--          <q-item-label class="text-black">-->
+<!--            <div v-if="managementData.hyperscan.db_version.old_version !== null" class="text-positive text-bold">-->
+<!--              {{ managementData.hyperscan.db_version.old_version }}-->
+<!--            </div>-->
+<!--            <div v-else class="text-negative text-bold">-->
+<!--              UNKNOWN-->
+<!--            </div>-->
+<!--          </q-item-label>-->
+<!--        </div>-->
 
         <div class="col-2">
-          <q-item-label caption>HS DB CURRENT VERSION</q-item-label>
+          <q-item-label caption>HS DB TEST VERSION</q-item-label>
           <q-item-label class="text-black">
-            <div v-if="managementData.hyperscan.db_version.current_version !== null" class="text-positive text-bold">
-              {{ managementData.hyperscan.db_version.current_version }}
+            <div v-if="managementData.hyperscan.db_version.loaded_version !== null" class="text-positive text-bold">
+              {{ managementData.hyperscan.db_version.loaded_version }}
             </div>
             <div v-else class="text-negative text-bold">
               UNKNOWN
