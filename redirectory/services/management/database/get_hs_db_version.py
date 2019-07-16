@@ -14,7 +14,7 @@ from flask import make_response, jsonify
 from flask_restplus import Resource
 
 from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
-from redirectory.libs_int.hyperscan import get_hs_db_version
+from redirectory.libs_int.hyperscan import get_hs_db_version, HsManager
 from redirectory.libs_int.service import NamespaceManager
 
 DATABASE_GET_VERSION_REQUEST_DURATION_SECONDS = REQUESTS_DURATION_SECONDS.labels("management")
@@ -28,9 +28,11 @@ class ManagementGetDBVersion(Resource):
     @DATABASE_GET_VERSION_REQUEST_DURATION_SECONDS.time()
     def get(self):
         old_version, current_version = get_hs_db_version()
+        hs_db_version = HsManager().database.db_version
 
         return make_response(jsonify({
             "old_version": old_version,
             "current_version": current_version,
+            "loaded_version": hs_db_version,
             "status": "done"
         }), 200)

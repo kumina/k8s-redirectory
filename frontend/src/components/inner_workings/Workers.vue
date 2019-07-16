@@ -17,8 +17,22 @@
         <div class="col-auto" style="margin-right: 10px">
           <q-btn @click="compile_hs_db()" color="accent" icon="launch" label="COMPILE NEW HS DB"></q-btn>
         </div>
-        <div class="col" style="margin-right: 10px">
+        <div class="col-auto" style="margin-right: 10px">
           <q-btn @click="update_all_pods()" color="primary" icon="update" label="UPDATE ALL"></q-btn>
+        </div>
+        <div class="col flex flex-center text-h6" style="margin-right: 10px" v-if="global_version !== null">
+          Global current version:
+          <div v-if="global_version.current_version" class="text-bold text-primary">
+             &#160;{{ global_version.current_version }}
+          </div>
+          <div v-else>
+            <b class="text-negative">&#160;NONE</b>
+          </div>
+        </div>
+        <div class="col flex flex-center text-h6" v-else>
+          <b class="text-negative">
+            Can't connect to backend!
+          </b>
         </div>
         <div class="col-auto flex flex-center" style="margin-right: 10px">
           Refreshed: <b class="text-primary">&#160;{{ last_refreshed_seconds_ago }}s&#160;</b>
@@ -79,6 +93,7 @@ export default {
   },
   data () {
     return {
+      global_version: null,
       management_data: null,
       workers_data: [],
 
@@ -106,6 +121,23 @@ export default {
       this.last_refreshed_seconds_ago = Math.round(seconds)
     },
     load_data () {
+      this.$axios.get(this.$store.state.api.MGMT_DB_VERSION)
+        .then((response) => {
+          this.global_version = response.data
+          console.log(this.global_version)
+        })
+        .catch((error) => {
+          let errorData = error.response.data
+
+          this.$q.notify({
+            color: 'negative',
+            position: 'top',
+            message: 'Unable to global DB version!\n' + errorData.error,
+            icon: 'report_problem',
+            actions: [{ icon: 'close', color: 'white' }]
+          })
+        })
+
       this.$axios.get(this.$store.state.api.MGMT_KUBERNETES_GET_MANAGEMENT)
         .then((response) => {
           this.management_data = response.data.management
