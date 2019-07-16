@@ -40,7 +40,6 @@ class WorkerRedirect(Resource):
     @TOTAL_REQUESTS_REDIRECTED_DURATION_SECONDS.time()
     def get(self, content=None):
         del content
-        is_404 = False
         host = request.host.split(":")[0]
         path = request.path
 
@@ -62,8 +61,7 @@ class WorkerRedirect(Resource):
             with HYPERSCAN_REQUESTS_REDIRECTED_DURATION_SECONDS.time():  # Metric
                 matching_ids = hs_manager.search(domain=host, path=path)
 
-            if matching_ids is None:
-                is_404 = True
+            is_404 = matching_ids is None
         except AssertionError as e:
             Logger() \
                 .event(category="hyperscan", action="hyperscan search failed") \

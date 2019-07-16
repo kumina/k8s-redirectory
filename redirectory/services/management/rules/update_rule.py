@@ -16,7 +16,7 @@ For more information on how the update rule process works take a look at update_
 from flask import make_response, jsonify, request
 from flask_restplus import Resource, fields
 
-from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
+from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.libs_int.service import NamespaceManager, api_error
 from redirectory.libs_int.database import DatabaseManager, update_redirect_rule, db_encode_model
 
@@ -54,12 +54,16 @@ class ManagementUpdateRule(Resource):
             serialized_updated_redirect_rule = db_encode_model(updated_redirect_rule, expand=True)
 
             DatabaseManager().return_session(db_session)
+            metric_update_rules_total()  # Metrics
+
             return make_response(jsonify({
                 "updated_rule": serialized_updated_redirect_rule,
                 "status": "done"
             }), 200)
         else:
             DatabaseManager().return_session(db_session)
+            metric_update_rules_total()  # Metrics
+
             return api_error(
                 message="Unable to update redirect rule",
                 errors=f"Redirect rule with id: {args['redirect_rule_id']} does not exist",

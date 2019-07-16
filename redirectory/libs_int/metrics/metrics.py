@@ -46,6 +46,28 @@ HYPERSCAN_DB_VERSION = Gauge(
     labelnames=("node_type",)
 )
 
+# Rules metrics
+RULES_TOTAL = Gauge(
+    name=f"{PREFIX}_rules_total",
+    documentation="The total number of rules currently in the database"
+)
+
+
+def update_rules_total():
+    """
+    This function updates the RULES_TOTAL metric every time it is called with a count from the DB
+    """
+    from redirectory.libs_int.database import db_get_table_row_count, DatabaseManager
+    from redirectory.models import RedirectRule
+
+    # Get count from DB
+    db_session = DatabaseManager().get_session()
+    new_count = db_get_table_row_count(db_session, RedirectRule)
+    DatabaseManager().return_session(db_session)
+
+    # Set count to metric
+    RULES_TOTAL.set(new_count)
+
 
 def start_metrics_server():
     """

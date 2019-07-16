@@ -19,7 +19,7 @@ from time import time
 from flask import make_response, jsonify, request
 from flask_restplus import Resource, fields
 
-from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
+from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.models import RedirectRule, DomainRule, PathRule, DestinationRule
 from redirectory.libs_int.database import DatabaseManager, db_encode_model, paginate, Page, db_sanitize_like_query
 from redirectory.libs_int.service import NamespaceManager, api_error
@@ -97,6 +97,10 @@ class ManagementGetPage(Resource):
 
         # Return DB session and return response
         DatabaseManager().return_session(db_session)
+
+        # Metrics
+        metric_update_rules_total()
+
         return make_response(jsonify({
             "data": data,
             "page": {

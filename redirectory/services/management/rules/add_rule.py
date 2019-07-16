@@ -15,7 +15,7 @@ Redirect Rule instance will be returned.
 from flask import make_response, jsonify, request
 from flask_restplus import Resource, fields
 
-from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
+from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.libs_int.database import DatabaseManager, db_encode_model, add_redirect_rule
 from redirectory.libs_int.service import NamespaceManager, api_error
 
@@ -51,6 +51,10 @@ class ManagementAddRule(Resource):
             redirect_rule_data = db_encode_model(redirect_rule_instance, expand=True)
 
             DatabaseManager().return_session(db_session)
+
+            # Metrics
+            metric_update_rules_total()
+
             return make_response(jsonify({
                 "new_rule": redirect_rule_data,
                 "status": "done"
