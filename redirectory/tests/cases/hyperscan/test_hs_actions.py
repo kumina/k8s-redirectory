@@ -24,7 +24,7 @@ class TestHyperscanActions:
 
         # Check
         assert path_ids == [1, 2, 3, 4, 5]
-        assert path_expressions == [b'1\\/test\\/path', b'2/test/path/a.*', b'3/test/path/.*',
+        assert path_expressions == [b'1/test/path', b'2/test/path/a.*', b'3/test/path/.*',
                                     b'4/test/path.*', b'5/test/pa.*']
 
         # Get Domain Rules
