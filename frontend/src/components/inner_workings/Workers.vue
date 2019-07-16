@@ -135,7 +135,7 @@ export default {
           this.$q.notify({
             color: 'negative',
             position: 'top',
-            message: 'Unable to global DB version!\n' + errorData.error,
+            message: 'Unable to get global DB version!\n' + errorData.error,
             icon: 'report_problem',
             actions: [{ icon: 'close', color: 'white' }]
           })

@@ -31,7 +31,7 @@ from flask import make_response, jsonify
 from flask_restplus import Resource, reqparse
 from werkzeug.datastructures import FileStorage
 
-from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
+from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.libs_int.importers import CSVImporter
 from redirectory.libs_int.service import NamespaceManager, api_error
 
@@ -66,6 +66,9 @@ class ManagementBulkImportRules(Resource):
 
         import_thread = threading.Thread(target=csv_importer.import_into_db)
         import_thread.start()
+
+        # Metrics
+        metric_update_rules_total()
 
         return make_response(jsonify({
             "status": "Import has been started. Rules will appear in DB when the import is complete."

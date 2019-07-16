@@ -18,7 +18,7 @@ If no Redirect Rule with the given id exists then a 404 will be returned.
 from flask import make_response, jsonify, request
 from flask_restplus import Resource, fields
 
-from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
+from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.libs_int.database import DatabaseManager, delete_redirect_rule
 from redirectory.libs_int.service import NamespaceManager, api_error
 
@@ -48,6 +48,9 @@ class ManagementDeleteRule(Resource):
 
         # Release session
         DatabaseManager().return_session(db_session)
+
+        # Metrics
+        metric_update_rules_total()
 
         if is_deleted:
             return make_response(jsonify({

@@ -19,7 +19,7 @@ from flask_restplus import Resource
 
 from redirectory.models import RedirectRule
 from redirectory.runnables import CompilerJob
-from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS
+from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.libs_int.database import DatabaseManager, db_get_table_row_count
 from redirectory.libs_int.sync import Synchronizer
 from redirectory.libs_int.service import NamespaceManager, api_error
@@ -53,6 +53,9 @@ class ManagementCompileNewDbTest(Resource):
 
         compile_thread = Thread(target=compiler.run)
         compile_thread.start()
+
+        # Metrics
+        metric_update_rules_total()
 
         return make_response(jsonify({
             "message": "New hyperscan DB are compiled for testing",
