@@ -49,7 +49,9 @@ class RunnableService(Runnable, ABC):
                 .http_response(status_code=response.status_code) \
                 .out(severity=Severity.INFO)
 
-            REQUESTS_TOTAL.labels(config.node_type, str(response.status_code)).inc()
+            if "status" not in request.path:
+                REQUESTS_TOTAL.labels(config.node_type, str(response.status_code)).inc()
+
             return response
 
         self.host = self.config.service.ip
