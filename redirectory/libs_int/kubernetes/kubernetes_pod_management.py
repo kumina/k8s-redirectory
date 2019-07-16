@@ -61,7 +61,8 @@ class ManagementPod(Pod):
             response = requests.get(url).json()
             return {
                 "current_version": response["current_version"],
-                "old_version": response["old_version"]
+                "old_version": response["old_version"],
+                "loaded_version": response["loaded_version"]
             }
         except ConnectionError:
             return {}

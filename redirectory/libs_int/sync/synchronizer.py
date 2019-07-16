@@ -159,6 +159,39 @@ class Synchronizer:
                 dataset=f"triggered management update for new hs db version: {new_version}"
             ).out(severity=Severity.INFO)
 
+    def util_new_hs_db_version_callback_test(self, new_version: str):
+        """
+        The function is the same as util_new_hs_db_version_callback().
+        The only difference between the two is that the test variant only loads the database on
+        the management pod. All of the worker pods will be left untouched.
+
+        Args:
+            new_version: the new version of the just compiled db
+        """
+        if new_version is self.current_hs_db_version:
+            return
+
+        self.current_hs_db_version = new_version
+
+        Logger().event(
+            category="synchronizer",
+            action="synchronizer new hs db version test",
+            dataset=f"new hs db version: {new_version}"
+        ).out(severity=Severity.INFO)
+
+        # Metrics
+        HYPERSCAN_DB_COMPILED_TOTAL.labels(self.configuration.node_type).inc()
+        HYPERSCAN_DB_VERSION.labels(self.configuration.node_type).set(new_version)
+
+        # Trigger management update
+        management = K8sManager().get_management_pod()
+        if management and management.reload_hs_db():
+            Logger().event(
+                category="synchronizer",
+                action="synchronizer management update test",
+                dataset=f"triggered management update for new hs db version: {new_version}"
+            ).out(severity=Severity.INFO)
+
     def util_get_sync_files_as_zip(self):
         """
         Gathers the needed files to sync a worker into one in-memory zip file.
