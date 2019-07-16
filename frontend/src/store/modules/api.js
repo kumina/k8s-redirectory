@@ -10,6 +10,7 @@ const api = {
     API_DOC_URL: API_DOC_URL,
 
     MGMT_DB_COMPILE: MGMT_URL + '/database/compile',
+    MGMT_DB_COMPILE_TEST: MGMT_URL + '/database/compile_test',
     MGMT_DB_VERSION: MGMT_URL + '/database/version',
     MGMT_DB_RELOAD_MANAGEMENT: MGMT_URL + '/database/reload_management',
     MGMT_DB_RELOAD_WORKERS: MGMT_URL + '/database/reload_workers',

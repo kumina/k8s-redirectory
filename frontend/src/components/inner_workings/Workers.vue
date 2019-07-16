@@ -15,7 +15,10 @@
     <q-card-section>
       <div class="row">
         <div class="col-auto" style="margin-right: 10px">
-          <q-btn @click="compile_hs_db()" color="accent" icon="launch" label="COMPILE NEW HS DB"></q-btn>
+          <q-btn @click="compile_hs_db_test()" color="secondary" icon="launch" label="COMPILE TEST HS DB & UPDATE MANAGEMENT"></q-btn>
+        </div>
+        <div class="col-auto" style="margin-right: 10px">
+          <q-btn @click="compile_hs_db()" color="accent" icon="launch" label="COMPILE NEW HS DB & UPDATE ALL"></q-btn>
         </div>
         <div class="col-auto" style="margin-right: 10px">
           <q-btn @click="update_all_pods()" color="primary" icon="update" label="UPDATE ALL"></q-btn>
@@ -107,8 +110,8 @@ export default {
   created () {
     this.load_data()
 
-    // this.timer_update_data = setInterval(this.load_data, this.timer_refresh_period)
-    // this.timer_refresh_ago = setInterval(this.update_refresh_time, 500)
+    this.timer_update_data = setInterval(this.load_data, this.timer_refresh_period)
+    this.timer_refresh_ago = setInterval(this.update_refresh_time, 500)
   },
   beforeDestroy () {
     clearInterval(this.timer_update_data)
@@ -223,6 +226,35 @@ export default {
     },
     compile_hs_db () {
       this.$axios.get(this.$store.state.api.MGMT_DB_COMPILE)
+        .then((response) => {
+          let message = response.data.message
+
+          this.$q.notify({
+            color: 'green',
+            position: 'top',
+            message: message,
+            icon: 'check',
+            actions: [{ icon: 'close', color: 'white' }]
+          })
+        })
+        .catch((error) => {
+          let message = error.response.data.error
+
+          if (error.response.status === 404) {
+            message = 'Unexpected error 404! Please check the connection to the server!'
+          }
+
+          this.$q.notify({
+            color: 'negative',
+            position: 'top',
+            message: message,
+            icon: 'report_problem',
+            actions: [{ icon: 'close', color: 'white' }]
+          })
+        })
+    },
+    compile_hs_db_test () {
+      this.$axios.get(this.$store.state.api.MGMT_DB_COMPILE_TEST)
         .then((response) => {
           let message = response.data.message
 
