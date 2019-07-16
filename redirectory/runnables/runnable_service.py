@@ -33,7 +33,7 @@ class RunnableService(Runnable, ABC):
         def _after_request(response: Response):
             """
             Logs every request that has been processed by the application.
-            Logs Prometheus metrics for how many requests
+            Logs Prometheus metrics for every request except for the status updates. (health and readiness checks)
 
             Args:
                 response: the response to be returned
@@ -42,6 +42,7 @@ class RunnableService(Runnable, ABC):
                 the unmodified response
             """
             config = Configuration().values
+
             Logger() \
                 .event(category="requests", action="request received") \
                 .url(path=request.path, domain=request.host) \

@@ -1,5 +1,6 @@
-// const BASE_URL = 'http://0.0.0.0:8001'
-const BASE_URL = ''
+const BASE_URL = 'http://0.0.0.0:8001'
+// const BASE_URL = 'https://redirectory.kumina.nl'
+// const BASE_URL = ''
 const MGMT_URL = BASE_URL + '/management'
 const STATUS_URL = BASE_URL + '/status'
 const API_DOC_URL = BASE_URL + '/redirectory-doc'

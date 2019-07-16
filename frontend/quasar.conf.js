@@ -55,6 +55,7 @@ module.exports = function (ctx) {
         'QBtnToggle',
         'QMarkupTable',
         'QUploader',
+        'QUploaderAddTrigger',
         'QTooltip',
         'QSpinner',
         'QFooter',
