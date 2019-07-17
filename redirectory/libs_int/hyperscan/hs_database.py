@@ -27,11 +27,11 @@ class HsDatabase:
         self.domain_db_path = os.path.join(config.directories.data, config.hyperscan.domain_db)
         self.rules_db_path = os.path.join(config.directories.data, config.hyperscan.rules_db)
 
-    def compile_rules_db(self, expressions: List[bytes], ids: List[int]):
-        self.rules_db = HsDatabase.compile_db_in_memory(expressions, ids)
+    def compile_rules_db(self, expressions: List[bytes], ids: List[int], flags: List[int]):
+        self.rules_db = HsDatabase.compile_db_in_memory(expressions, ids, flags)
 
-    def compile_domain_db(self, expressions: List[bytes], ids: List[int]):
-        self.domain_db = HsDatabase.compile_db_in_memory(expressions, ids)
+    def compile_domain_db(self, expressions: List[bytes], ids: List[int], flags: List[int]):
+        self.domain_db = HsDatabase.compile_db_in_memory(expressions, ids, flags)
 
     def load_database(self):
         """
@@ -56,12 +56,10 @@ class HsDatabase:
         self.load_database()
 
     @staticmethod
-    def compile_db_in_memory(expressions: List[bytes], ids: List[int]) -> hs.Database:
+    def compile_db_in_memory(expressions: List[bytes], ids: List[int], flags: List[int]) -> hs.Database:
         assert len(expressions) == len(ids), "There must be an id for every expression."
 
-        flags = [hs.HS_FLAG_SOM_LEFTMOST, hs.HS_FLAG_ALLOWEMPTY] * len(expressions)
         db = hs.Database(mode=HYPERSCAN_DB_MODE)
-        print(expressions)
         db.compile(expressions=expressions, ids=ids, flags=flags)
         return db
 
@@ -85,6 +83,7 @@ class HsDatabase:
     def _save_hs_db(path: str, db_to_save: hs.Database):
         """
         TODO:
+
         Args:
             path:
             db_to_save:

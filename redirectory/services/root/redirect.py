@@ -11,17 +11,18 @@ The Worker Redirect endpoint is the CORE endpoint of the application.
 It parses a request into a host and path. It conducts a search with the help
 of the HsManager() on the host and path. The search returns a list of matched ids
 of RedirectRules. If the list is larger than one then we pick the final match
-with the help of HsManager.pick_result() function. If a while picking the final result
+with the help of HsManager.pick_result() function. If while picking the final result
 there are two or more rules with the same weight then the request is considered
-ambiguous and it is added to the Ambiguous Table.
-
-TODO: Implement back reference
+ambiguous and it is added to the Ambiguous Table. Also if the rewrite is not
+configured correctly then a 404 page will be returned and the request will be also
+added to the Ambiguous Table for later checking by a person.
 """
+from typing import Optional
+
 from flask import request, redirect
 from flask_restplus import Resource
 from kubi_ecs_logger import Logger, Severity
 
-from redirectory.libs_int.service import api_error
 from redirectory.libs_int.hyperscan import HsManager
 from redirectory.libs_int.database import DatabaseManager
 from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, REQUESTS_REDIRECTED_DURATION_SECONDS, \
@@ -45,11 +46,7 @@ class WorkerRedirect(Resource):
 
         # Stop spamming for favicon pls
         if path == "/favicon.ico":
-            return api_error(
-                message="404 Page Not Found",
-                errors="Hmm, the thing you are looking for is not here!",
-                status_code=404
-            )
+            self.page_404()
 
         # Init managers and sessions
         hs_manager = HsManager()
@@ -72,11 +69,7 @@ class WorkerRedirect(Resource):
 
         if is_404:
             REQUESTS_REDIRECTED_TOTAL.labels("worker", "404", "not_found").inc()
-            return api_error(
-                message="404 Page Not Found",
-                errors="Hmm, the thing you are looking for is not here!",
-                status_code=404
-            )
+            self.page_404()
 
         # Get final result
         with DB_LOOKUP_REQUESTS_REDIRECTED_DURATION_SECONDS.time():  # Metric
@@ -84,12 +77,14 @@ class WorkerRedirect(Resource):
             final_destination_url = final_redirect_rule.destination_rule.destination_url
             is_back_ref: bool = final_redirect_rule.destination_rule.is_rewrite
 
-        # Sanitize final redirect url
-        final_destination_url = self.sanitize_outgoing_redirect(final_destination_url)
+        # Do back reference
+        if is_back_ref:
+            final_destination_url = self.apply_back_reference(path, final_redirect_rule)
 
         # Add ambiguous request to db if needed
-        if is_ambiguous:
+        if is_ambiguous or final_destination_url is None:
             from redirectory.libs_int.kubernetes import K8sManager, ManagementPod
+
             try:
                 management_pod: ManagementPod = K8sManager().get_management_pod()
                 management_pod.add_ambiguous_request(request.url)
@@ -100,10 +95,11 @@ class WorkerRedirect(Resource):
                     .error(message=str(e)) \
                     .out(severity=Severity.ERROR)
 
-        # Do back reference
-        if is_back_ref:
-            # TODO: edit the final destination url
-            pass
+            if final_destination_url is None:
+                self.page_404()
+
+        # Sanitize final redirect url
+        final_destination_url = self.sanitize_outgoing_redirect(final_destination_url)
 
         DatabaseManager().return_session(db_session)
 
@@ -131,3 +127,56 @@ class WorkerRedirect(Resource):
             return current_redirect
         else:
             return f"https://{current_redirect}"
+
+    @staticmethod
+    def apply_back_reference(path: str, rule) -> Optional[str]:
+        """
+        If the destination rule is a rewrite rule then this function is responsible for
+        creating the new destination url that has to be redirected to.
+        It uses regex groups and string formatting from Python to achieve this.
+
+        Args:
+            host: the host of the incoming request
+            path: the path of the incoming request
+            rule: the rule that has matched for this request
+
+        Returns:
+            the final url to which the user should be redirected or None if it is configured wrong
+        """
+        import re
+        import string
+
+        try:
+            # Get the rules from the Redirect rule obj
+            path_rule: str = rule.path_rule.rule
+            destination_rule: str = rule.destination_rule.destination_url
+
+            # Extract all the groups and their values from the path
+            r = re.compile(path_rule)
+            groups_and_values = [m.groupdict() for m in r.finditer(path)][0]
+
+            # Get all the variables that need to be replaced
+            variables_to_replace = [tup[1] for tup in string.Formatter().parse(destination_rule) if tup[1] is not None]
+
+            # Check and get all the needed vars to construct the final url
+            replace_map = {}
+            for var in variables_to_replace:
+                if var in groups_and_values:
+                    replace_map[var] = groups_and_values[var]
+
+            # Replace all the placeholders with correct values
+            destination_rule = destination_rule.format(**replace_map)
+
+            return destination_rule
+        except (KeyError, AttributeError, re.error):
+            return None
+
+    @staticmethod
+    def page_404():
+        from redirectory.libs_int.service import api_error
+
+        return api_error(
+            message="404 Page Not Found",
+            errors="Hmm, the thing you are looking for is not here!",
+            status_code=404
+        )

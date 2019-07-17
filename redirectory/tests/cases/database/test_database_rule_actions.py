@@ -47,11 +47,27 @@ class TestDatabaseRuleActions:
         assert rule_3.path_rule.id == 2
 
         # Check already existing
-        rule_same: RedirectRule = add_redirect_rule(db_session,
-                                                    'ivaylo.bg', False,
-                                                    '/test', False,
-                                                    'https://new.kumina.nl', False, 100)
-        assert rule_same is None
+        rule_same = add_redirect_rule(db_session,
+                                      'ivaylo.bg', False,
+                                      '/test', False,
+                                      'https://new.kumina.nl', False, 100)
+        assert isinstance(rule_same, int)
+        assert rule_same == 2
+
+        # Check rewrite validation
+        rule_same = add_redirect_rule(db_session,
+                                      'ivaylo.bg', False,
+                                      '/test(?P<asd>.*)', True,
+                                      'https://new.kumina.nl{asda}', True, 100)
+        assert isinstance(rule_same, int)
+        assert rule_same == 1
+
+        rule_same = add_redirect_rule(db_session,
+                                      'ivaylo.bg', False,
+                                      '/test(?asd>.*[?])', True,
+                                      'https://new.kumina.nl{asda}', True, 100)
+        assert isinstance(rule_same, int)
+        assert rule_same == 1
 
         # Return session
         DatabaseManager().return_session(db_session)
@@ -87,12 +103,19 @@ class TestDatabaseRuleActions:
         assert rule.path_rule.rule == '/new/update'
         assert rule.destination_rule.destination_url == 'https://google.com'
 
-        # Update non existent rule
+        # Check non existent rule
         updated_rule = update_redirect_rule(db_session, 1001,
                                             '', False, '', False, '', False, 100)
+        assert isinstance(updated_rule, int)
+        assert updated_rule == 2
 
-        # Check
-        assert updated_rule is None
+        # Check validation for rewrite rule
+        updated_rule = update_redirect_rule(db_session, 1,
+                                            'asdasasdasd.com', False,
+                                            '/wrong/pattern??[<asd>]>??', True,
+                                            'the_best_destination_but_the_wrong_one{aa}?', True, 100)
+        assert isinstance(updated_rule, int)
+        assert updated_rule == 1
 
         # Return session
         DatabaseManager().return_session(db_session)
@@ -203,3 +226,29 @@ class TestDatabaseRuleActions:
 
         # Return session
         DatabaseManager().return_session(db_session)
+
+    def test_validate_rewrite_rule(self, configuration):
+        """
+        Starts with nothing/
+        Test the validate_rewrite_rule() function.
+        Expected behaviour:
+            1. Validates the rule correctly if it is going to work as a rewrite rule
+        """
+
+        # Import needed functions and classes
+        from redirectory.libs_int.database import validate_rewrite_rule
+
+        result = validate_rewrite_rule("/(?P<asd>.*)", True, "asadasad{asd}")
+        assert result
+
+        result = validate_rewrite_rule("/(?P<asd>.*)", False, "asadasad{asd}")
+        assert not result
+
+        result = validate_rewrite_rule("/(?P<asd>.*)", True, "asadasad{asda}")
+        assert not result
+
+        result = validate_rewrite_rule("/(?P<one>.*)/(?P<two>.*)", True, "asadasad{one}asdd{two}")
+        assert result
+
+        result = validate_rewrite_rule("/(?P<one>.*)/(?P<two>.*)", True, "asadasad{one}asdd")
+        assert not result

@@ -11,7 +11,7 @@ from .management.database.reload_workers_hs_db import ManagementReloadWorkersHsD
 from .management.database.reload_worker_hs_db import ManagementReloadWorkerHsDb
 from .management.database.reload_management_hs_db import ManagementReloadManagementHsDb
 from .management.database.compile_hs_database import ManagementCompileNewDb
-from .management.database.compile_hs_database_test import ManagementCompileNewDbTest
+from .management.database.compile_hs_database_management import ManagementCompileNewDbTest
 from .management.database.get_hs_db_version import ManagementGetDBVersion
 
 from .management.kubernetes.get_workers import ManagementKubernetesGetWorkers

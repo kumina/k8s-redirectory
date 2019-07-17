@@ -18,6 +18,7 @@ from .database_rule_actions import delete_redirect_rule
 from .database_rule_actions import update_redirect_rule
 from .database_rule_actions import get_usage_count
 from .database_rule_actions import get_model_by_id
+from .database_rule_actions import validate_rewrite_rule
 
 # Database ambiguous request actions
 from .database_ambiguous_actions import add_ambiguous_request

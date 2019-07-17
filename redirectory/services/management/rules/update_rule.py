@@ -5,12 +5,15 @@ Method: POST
 
 RESPONSES:
     - 200: The Redirect Rule with that id was successfully updated
-    - 404: A Redirect Rule with that id does NOT exist
+    - 400: Something went wrong during updating of the Redirect Rule. Check the error message for more info
 
 The Update Rule endpoint provides the ability to update the information for a given Redirect Rule in
 the database. In the post data all of the needed information for the creation of a rule is specified including
-the Redirect Rule ID which points to which rule you wish to update. If a Redirect Rule with that ID is not
-found then a 404 is returned.
+the Redirect Rule ID which points to which rule you wish to update.
+
+If a Redirect Rule with that ID is not found then a 400 is returned.
+If the new Redirect Rule fails the rewrite check 400 will be returned as well.
+
 For more information on how the update rule process works take a look at update_redirect_rule() function.
 """
 from flask import make_response, jsonify, request
@@ -49,7 +52,16 @@ class ManagementUpdateRule(Resource):
         db_session = DatabaseManager().get_session()
 
         updated_redirect_rule = update_redirect_rule(db_session, **args)
-
+        if isinstance(updated_redirect_rule, int):
+            DatabaseManager().return_session(db_session)
+            metric_update_rules_total()  # Metrics
+            return api_error(
+                message="Unable to update redirect rule",
+                errors=f"Redirect rule with id: {args['redirect_rule_id']} does not exist"
+                        if updated_redirect_rule == 2 else
+                        "The update rules fails the validation for rewrite! Check your path and destination fields.",
+                status_code=400
+            )
         if updated_redirect_rule:
             serialized_updated_redirect_rule = db_encode_model(updated_redirect_rule, expand=True)
 
@@ -60,13 +72,4 @@ class ManagementUpdateRule(Resource):
                 "updated_rule": serialized_updated_redirect_rule,
                 "status": "done"
             }), 200)
-        else:
-            DatabaseManager().return_session(db_session)
-            metric_update_rules_total()  # Metrics
-
-            return api_error(
-                message="Unable to update redirect rule",
-                errors=f"Redirect rule with id: {args['redirect_rule_id']} does not exist",
-                status_code=404
-            )
 

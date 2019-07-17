@@ -5,7 +5,7 @@ Method: POST
 
 RESPONSES:
     - 200: A new rule successfully added to the Redirect Rule database
-    - 400: A Redirect Rule like this already exists
+    - 400: Something went wrong during adding the new rule. Check the error which specifies which check it failed
 
 The Add Rule endpoint provides the ability to create/add new rule to the Redirect Rule database.
 While creating the new Redirect Rule it checks if the rule already exists. If it does a 404 is returned.
@@ -15,6 +15,7 @@ Redirect Rule instance will be returned.
 from flask import make_response, jsonify, request
 from flask_restplus import Resource, fields
 
+from redirectory.models import RedirectRule
 from redirectory.libs_int.metrics import REQUESTS_DURATION_SECONDS, metric_update_rules_total
 from redirectory.libs_int.database import DatabaseManager, db_encode_model, add_redirect_rule
 from redirectory.libs_int.service import NamespaceManager, api_error
@@ -47,9 +48,17 @@ class ManagementAddRule(Resource):
         db_session = DatabaseManager().get_session()
 
         redirect_rule_instance = add_redirect_rule(db_session, **args)
-        if redirect_rule_instance:
-            redirect_rule_data = db_encode_model(redirect_rule_instance, expand=True)
 
+        if isinstance(redirect_rule_instance, int):
+            DatabaseManager().return_session(db_session)
+            return api_error(
+                message="Unable to add redirect rule",
+                errors="A rule like this already exists" if redirect_rule_instance == 2 else
+                       "Invalid rule with rewrite! Check your path and destination fields.",
+                status_code=400
+            )
+        if isinstance(redirect_rule_instance, RedirectRule):
+            redirect_rule_data = db_encode_model(redirect_rule_instance, expand=True)
             DatabaseManager().return_session(db_session)
 
             # Metrics
@@ -59,10 +68,3 @@ class ManagementAddRule(Resource):
                 "new_rule": redirect_rule_data,
                 "status": "done"
             }), 200)
-        else:
-            DatabaseManager().return_session(db_session)
-            return api_error(
-                message="Unable to add redirect rule",
-                errors="A rule like this already exists",
-                status_code=400
-            )
