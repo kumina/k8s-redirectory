@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 from typing import Tuple, List, Optional
 
+import hyperscan as hs
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -9,15 +10,17 @@ from redirectory.libs_int.database import DatabaseManager
 from redirectory.models import HsDbVersion
 
 
-def get_expressions_and_ids(db_model: DeclarativeMeta,
-                            expression_path: str,
-                            expression_regex_path: str,
-                            id_path: str,
-                            combine_expr_with: str = None) -> Tuple[List[bytes], List[int]]:
+def get_expressions_ids_flags(db_model: DeclarativeMeta,
+                              expression_path: str,
+                              expression_regex_path: str,
+                              id_path: str,
+                              combine_expr_with: str = None) -> Tuple[List[bytes], List[int], List[int]]:
     """
     Gets the expression in the correct format from the database.
     Depending on the arguments the expression can be combined with another piece
     of data. The expression will also be regex escaped if it is a literal.
+    If the expression is a regex then a second check will be conducted which checks if the expression
+    matches an empty string. If so a different flag than the default is applied.
 
     Args:
         db_model: The model/table of the current database
@@ -27,10 +30,11 @@ def get_expressions_and_ids(db_model: DeclarativeMeta,
         combine_expr_with: The attribute of extra piece of data that can be appended before the expression
 
     Returns:
-        a tuple containing the expressions and the ids. tuple(expressions, ids)
+        a tuple containing the expressions, the ids and the flags. tuple(expressions, ids, flags)
     """
     expressions = []
     ids = []
+    flags = []
 
     db_session = DatabaseManager().get_session()
 
@@ -43,8 +47,16 @@ def get_expressions_and_ids(db_model: DeclarativeMeta,
             combine_with = multi_getattr(instance, combine_expr_with)
             expression = str(combine_with) + expression
 
-        if not expression_regex:
+        if expression_regex:
+            compiled_ex = re.compile(expression)
+            if compiled_ex.search(""):
+                flags.append(hs.HS_FLAG_ALLOWEMPTY)
+            else:
+                flags.append(hs.HS_FLAG_SOM_LEFTMOST)
+            del compiled_ex
+        else:
             expression = re.escape(expression)
+            flags.append(hs.HS_FLAG_SOM_LEFTMOST)
 
         ids.append(expression_id)
         expressions.append(expression.encode("UTF-8"))
@@ -52,7 +64,7 @@ def get_expressions_and_ids(db_model: DeclarativeMeta,
     # Release db session
     DatabaseManager().return_session(db_session)
 
-    return expressions, ids
+    return expressions, ids, flags
 
 
 def multi_getattr(obj, attr, default=None):

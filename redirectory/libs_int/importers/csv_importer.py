@@ -87,7 +87,9 @@ class CSVImporter:
                 self.data_template["destination_is_rewrite"] = self._get_bool_from_str(row[5])
                 self.data_template["weight"] = int(row[6])
 
-                add_redirect_rule(db_session, **self.data_template, commit=False)
+                result = add_redirect_rule(db_session, **self.data_template, commit=False)
+                if isinstance(result, int) and result == 2:  # 2 means already exists
+                    raise AssertionError
         except AssertionError as e:
             Logger() \
                 .event(category="import", action="import failed") \

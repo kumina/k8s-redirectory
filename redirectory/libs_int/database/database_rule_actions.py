@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Union
 
 from kubi_ecs_logger import Logger, Severity
 from sqlalchemy import func, select
@@ -16,10 +16,13 @@ MODEL_PROPERTY_ID_MAP = {
 
 def add_redirect_rule(db_session, domain: str, domain_is_regex: bool, path: str, path_is_regex: bool,
                       destination: str, destination_is_rewrite: bool, weight: int, commit: bool = True) \
-        -> Optional[RedirectRule]:
+        -> Union[RedirectRule, int]:
     """
     Creates a new Redirect Rule from all of the given arguments.
     If a domain, path or destination is already used it is just going to be re-used in the new rule.
+    Before all that it validates rules which are rewrites to see if they are configured correctly.
+
+    Depending on where the check failed different integers will be returned.
 
     Args:
         db_session: the database session to use for the DB actions
@@ -33,8 +36,17 @@ def add_redirect_rule(db_session, domain: str, domain_is_regex: bool, path: str,
         commit: should the function commit the new rule or just flush for ids
 
     Returns:
-        the new rule or None if it already exists
+        Redirect Rule - if all went well
+        1 (int) - if the check failed for rewrite rule
+        2 (int) - if the check for already existing rule failed
     """
+    if destination_is_rewrite and not validate_rewrite_rule(path, path_is_regex, destination):
+        Logger() \
+            .event(category="database", action="rule added") \
+            .log(original=f"Rewrite rule failed validation check") \
+            .out(severity=Severity.DEBUG)
+        return 1
+
     domain_instance, is_new_domain = db_get_or_create(db_session, DomainRule, rule=domain, is_regex=domain_is_regex)
     path_instance, is_new_path = db_get_or_create(db_session, PathRule, rule=path, is_regex=path_is_regex)
     dest_instance, is_new_dest = db_get_or_create(db_session, DestinationRule, destination_url=destination,
@@ -64,17 +76,19 @@ def add_redirect_rule(db_session, domain: str, domain_is_regex: bool, path: str,
             .log(original=f"Rule already exists") \
             .out(severity=Severity.DEBUG)
         db_session.rollback()
-        return None
+        return 2
 
 
 def update_redirect_rule(db_session, redirect_rule_id: int, domain: str, domain_is_regex: bool,
                          path: str, path_is_regex: bool, destination: str,
-                         destination_is_rewrite: bool, weight: int) -> Optional[RedirectRule]:
+                         destination_is_rewrite: bool, weight: int) \
+        -> Union[RedirectRule, int]:
     """
     Updates the rule with the given ID and with the given arguments.
     Finds the rule specified with the redirect_rule_id and updates it's values correspondingly.
-    If no rule with that ID is found the None is returned. If everything goes correctly then
-    the new version of the rule returned.
+    If everything goes correctly then the new version of the rule returned.
+    If no rule with that ID is found an integer is returned
+    If the new rule fails the rewrite validation an integer is returned
 
     Args:
         db_session: the database session to use for db actions
@@ -88,16 +102,24 @@ def update_redirect_rule(db_session, redirect_rule_id: int, domain: str, domain_
         weight: the new weight of the rule
 
     Returns:
-        the updated version of the rule or None
+        Redirect Rule - which is the updated version if all went well
+        1 (int) - rule exists but fails validation check for rewrite rule
+        2 (int) - rule with this id does not exist
     """
-    redirect_rule: RedirectRule = get_model_by_id(db_session, RedirectRule, redirect_rule_id)
+    if destination_is_rewrite and not validate_rewrite_rule(path, path_is_regex, destination):
+        Logger() \
+            .event(category="database", action="rule update") \
+            .log(original=f"The new rule updates make the rewrite rule incorrect") \
+            .out(severity=Severity.DEBUG)
+        return 1
 
+    redirect_rule: RedirectRule = get_model_by_id(db_session, RedirectRule, redirect_rule_id)
     if not redirect_rule:
         Logger() \
             .event(category="database", action="rule update") \
             .log(original=f"A rule with ID: {redirect_rule_id} does not exist") \
             .out(severity=Severity.DEBUG)
-        return None
+        return 2
 
     domain_instance, _ = db_get_or_create(db_session, DomainRule, rule=domain, is_regex=domain_is_regex)
     path_instance, _ = db_get_or_create(db_session, PathRule, rule=path, is_regex=path_is_regex)
@@ -177,3 +199,41 @@ def get_usage_count(db_session, model, model_instance_id) -> int:
     # Execute query and get number
     usage = db_session.execute(usage_query).scalar()
     return usage
+
+
+def validate_rewrite_rule(path: str, path_is_regex: bool, destination: str) -> bool:
+    """
+    Checks if all of the needed variables/placeholders in the destination rule are also appearing
+    in the path when compiled to a regex pattern.
+
+    Args:
+        path: the path rule to check for
+        path_is_regex: if the path rule is a regex (hint in order to pass this check it always has to be)
+        destination: the destination rule with placeholders in it
+
+    Returns:
+        True if the rule is valid else False
+    """
+    import re
+    import string
+
+    if path_is_regex is False:
+        return False
+
+    try:
+        # Get the groups from the regex pattern
+        path_re_pattern = re.compile(path)
+        groups = list(path_re_pattern.groupindex)
+
+        # Get all the variables that need to be replaced
+        variables_to_replace = [tup[1] for tup in string.Formatter().parse(destination) if tup[1] is not None]
+
+        if len(groups) != len(variables_to_replace):
+            return False
+
+        for var in variables_to_replace:
+            if var not in groups:
+                return False
+        return True
+    except Exception:  # All
+        return False

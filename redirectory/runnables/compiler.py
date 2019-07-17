@@ -4,12 +4,11 @@ from threading import Thread
 from kubi_ecs_logger import Logger, Severity
 
 from .runnable import Runnable
-from redirectory.libs_int.hyperscan import HsManager, update_hs_db_version, get_expressions_and_ids
+from redirectory.libs_int.hyperscan import HsManager, update_hs_db_version, get_expressions_ids_flags
 from redirectory.models import DomainRule, RedirectRule
 
 
 class CompilerJob(Runnable):
-
     done_callback_function: callable = None
 
     def __init__(self, done_callback_function: callable = None):
@@ -79,11 +78,11 @@ class CompilerJob(Runnable):
         Gets the domain expressions and ids into two lists sorted in the same way.
         With the help of the HsDatabase class compiles an in-memory Hyperscan database.
         """
-        domain_expressions, domain_ids = get_expressions_and_ids(db_model=DomainRule,
-                                                                 expression_path="rule",
-                                                                 expression_regex_path="is_regex",
-                                                                 id_path="id")
-        HsManager().database.compile_domain_db(domain_expressions, domain_ids)
+        domain_expressions, domain_ids, flags = get_expressions_ids_flags(db_model=DomainRule,
+                                                                          expression_path="rule",
+                                                                          expression_regex_path="is_regex",
+                                                                          id_path="id")
+        HsManager().database.compile_domain_db(domain_expressions, domain_ids, flags)
 
     @staticmethod
     def _compile_rules_db():
@@ -91,12 +90,12 @@ class CompilerJob(Runnable):
         Gets the path/redirect_rule expressions and ids into two lists sorted in the same way.
         With the help of the HsDatabase class compiles an in-memory Hyperscan database.
         """
-        path_expressions, path_ids = get_expressions_and_ids(db_model=RedirectRule,
-                                                             expression_path="path_rule.rule",
-                                                             expression_regex_path="path_rule.is_regex",
-                                                             id_path="id",
-                                                             combine_expr_with="domain_rule.id")
-        HsManager().database.compile_rules_db(path_expressions, path_ids)
+        path_expressions, path_ids, flags = get_expressions_ids_flags(db_model=RedirectRule,
+                                                                      expression_path="path_rule.rule",
+                                                                      expression_regex_path="path_rule.is_regex",
+                                                                      id_path="id",
+                                                                      combine_expr_with="domain_rule.id")
+        HsManager().database.compile_rules_db(path_expressions, path_ids, flags)
 
     def _run_production(self):
         pass

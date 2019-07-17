@@ -3,7 +3,7 @@ from redirectory.tests.fixtures import *
 
 class TestHyperscanActions:
 
-    def test_get_expressions_and_ids(self, database_populated):
+    def test_get_expressions_ids_flags(self, database_populated):
         """
         Starts with a populated database with 5 Redirect Rule entries.
         Test the get_expressions_and_ids() function.
@@ -12,31 +12,33 @@ class TestHyperscanActions:
             1. The function returns the correct output for model Domain RUle
         """
         # Import needed functions and classes
-        from redirectory.libs_int.hyperscan import get_expressions_and_ids
+        from redirectory.libs_int.hyperscan import get_expressions_ids_flags
         from redirectory.models import RedirectRule, DomainRule
 
         # Get Redirect Rules
-        path_expressions, path_ids = get_expressions_and_ids(db_model=RedirectRule,
-                                                             expression_path="path_rule.rule",
-                                                             expression_regex_path="path_rule.is_regex",
-                                                             id_path="id",
-                                                             combine_expr_with="domain_rule.id")
+        path_expressions, path_ids, flags = get_expressions_ids_flags(db_model=RedirectRule,
+                                                                      expression_path="path_rule.rule",
+                                                                      expression_regex_path="path_rule.is_regex",
+                                                                      id_path="id",
+                                                                      combine_expr_with="domain_rule.id")
 
         # Check
         assert path_ids == [1, 2, 3, 4, 5]
         assert path_expressions == [b'1/test/path', b'2/test/path/a.*', b'3/test/path/.*',
                                     b'4/test/path.*', b'5/test/pa.*']
+        assert flags == [256] * 5
 
         # Get Domain Rules
-        domain_expressions, domain_ids = get_expressions_and_ids(db_model=DomainRule,
-                                                                 expression_path="rule",
-                                                                 expression_regex_path="is_regex",
-                                                                 id_path="id")
+        domain_expressions, domain_ids, flags = get_expressions_ids_flags(db_model=DomainRule,
+                                                                          expression_path="rule",
+                                                                          expression_regex_path="is_regex",
+                                                                          id_path="id")
 
         # Check
         assert domain_ids == [1, 2, 3, 4, 5]
         assert domain_expressions == [b'asd\\.test\\.kumina\\.nl', b'ggg\\.test\\.kumina\\.nl', b'\\w+.test.kumina.nl',
                                       b'\\d+.test.kumina.nl', b'.*.test.kumina.nl']
+        assert flags == [256] * 5
 
     def test_multi_getattr(self, mocker):
         """

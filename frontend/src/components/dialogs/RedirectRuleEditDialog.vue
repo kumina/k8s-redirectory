@@ -40,7 +40,7 @@
             <q-input clearable input-class="text-h6" v-model="domain" filled label="DOMAIN" lazy-rules
                      :error="!is_domain_valid" :error-message="domain_err_msg" bottom-slots
                      @blur="domain_touched = true"
-                     placeholder="example.com" hint="At least 3 characters"/>
+                     placeholder="example.com" hint="At least 1 characters"/>
           </div>
           <div class="col-2 flex flex-center" style="margin-left: 10px">
             <q-toggle
@@ -138,7 +138,7 @@ export default {
       return this.$store.state.dialogs.redirectRule
     },
     is_domain_valid () {
-      return this.domain.length >= 3 || !this.domain_touched
+      return this.domain.length >= 1 || !this.domain_touched
     },
     is_path_valid () {
       return this.path.length >= 1 || !this.path_touched
