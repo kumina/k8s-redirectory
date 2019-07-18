@@ -39,6 +39,9 @@ This part of the documentation will show you how to get started using Redirector
 
    misc/overview
    misc/usage
+   misc/screencast
+   misc/rewrites
+   misc/defaults
    misc/install
    misc/kubernetes
    misc/testing

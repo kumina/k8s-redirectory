@@ -10,3 +10,8 @@
     background: none;
     /*width: 100%;*/
 }
+
+.video_screencast {
+    width: 100%    !important;
+    height: auto   !important;
+}
