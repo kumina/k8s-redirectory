@@ -314,7 +314,8 @@
 
           <q-footer class="bg-grey-3 text-black">
             <div class="text-center" style="padding-top: 2px; padding-bottom: 2px;">
-              Documentation for developers can be seen here: <b>link in the future</b>
+              Documentation for developers can be seen here:
+              <a href="https://redirectory.readthedocs.io">Redirectory Dev Docs</a>
             </div>
           </q-footer>
         </q-page>
