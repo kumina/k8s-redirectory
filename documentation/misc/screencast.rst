@@ -10,7 +10,7 @@ Bulk Import
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/bulk_import_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/bulk_import_cut.mp4">
    </video>
 
 View Rule
@@ -18,7 +18,7 @@ View Rule
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/view_rule_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/view_rule_cut.mp4">
    </video>
 
 Add Rule
@@ -26,7 +26,7 @@ Add Rule
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/simple_add_rule_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/simple_add_rule_cut.mp4">
    </video>
 
 Edit Rule
@@ -34,7 +34,7 @@ Edit Rule
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/edit_rule_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/edit_rule_cut.mp4">
    </video>
 
 Delete Rule
@@ -42,7 +42,7 @@ Delete Rule
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/delete_rule_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/delete_rule_cut.mp4">
    </video>
 
 Search Filters Usage
@@ -50,7 +50,7 @@ Search Filters Usage
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/search_filters_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/search_filters_cut.mp4">
    </video>
 
 Test Rule
@@ -58,7 +58,7 @@ Test Rule
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/test_request_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/test_request_cut.mp4">
    </video>
 
 Hyperscan DB and Workers
@@ -66,7 +66,7 @@ Hyperscan DB and Workers
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/hs_workers_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/hs_workers_cut.mp4">
    </video>
 
 Navigation
@@ -74,5 +74,5 @@ Navigation
 
 .. raw:: html
 
-   <video class="video_screencast" controls src="https://artifacts.kumina.nl/docs/screencast/navigation_cut.mp4">
+   <video class="video_screencast" type="video/mp4" controls src="https://artifacts.kumina.nl/docs/screencast/navigation_cut.mp4">
    </video>
