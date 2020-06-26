@@ -10,7 +10,8 @@ Bulk Import
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/bulk_import_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/bulk_import_cut.ogg" type="video/ogg;">
    </video>
 
 View Rule
@@ -18,7 +19,8 @@ View Rule
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/view_rule_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/view_rule_cut.ogg" type="video/ogg;">
    </video>
 
 Add Rule
@@ -26,7 +28,8 @@ Add Rule
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/simple_add_rule_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/simple_add_rule_cut.ogg" type="video/ogg;">
    </video>
 
 Edit Rule
@@ -34,7 +37,8 @@ Edit Rule
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/edit_rule_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/edit_rule_cut.ogg" type="video/ogg;">
    </video>
 
 Delete Rule
@@ -42,7 +46,8 @@ Delete Rule
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/delete_rule_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/delete_rule_cut.ogg" type="video/ogg;">
    </video>
 
 Search Filters Usage
@@ -50,7 +55,8 @@ Search Filters Usage
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/search_filters_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/search_filters_cut.ogg" type="video/ogg;">
    </video>
 
 Test Rule
@@ -58,7 +64,8 @@ Test Rule
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/test_request_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/test_request_cut.ogg" type="video/ogg;">
    </video>
 
 Hyperscan DB and Workers
@@ -66,7 +73,8 @@ Hyperscan DB and Workers
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/hs_workers_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/hs_workers_cut.ogg" type="video/ogg;">
    </video>
 
 Navigation
@@ -74,5 +82,6 @@ Navigation
 
 .. raw:: html
 
-   <video class="video_screencast" type="video/ogg; codecs='theora, vorbis'" controls src="https://artifacts.kumina.nl/docs/screencast/navigation_cut.ogg">
+   <video class="video_screencast" controls>
+        <source src="https://artifacts.kumina.nl/docs/screencast/navigation_cut.ogg" type="video/ogg;">
    </video>
