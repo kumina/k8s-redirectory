@@ -1,4 +1,5 @@
 from abc import ABC
+from threading import Thread
 from flask import Flask, request, Response
 
 from kubi_ecs_logger import Logger, Severity
@@ -8,6 +9,7 @@ from redirectory.libs_int.config import Configuration
 from redirectory.libs_int.metrics import REQUESTS_TOTAL, start_metrics_server
 from redirectory.libs_int.service import GunicornServer, Api
 from redirectory.libs_int.database import DatabaseManager
+from redirectory.libs_int.sync import Synchronizer
 
 
 class RunnableService(Runnable, ABC):
@@ -87,6 +89,13 @@ class RunnableService(Runnable, ABC):
 
     def _run_production(self, is_worker: bool = False):
         DatabaseManager().create_db_tables()
+
+        if is_worker:
+            # Start loading hyperscan database from management if it exists
+            sync = Synchronizer()
+
+            sync_thread = Thread(name="sync worker thread", target=sync.worker_sync_files)
+            sync_thread.start()
 
         service_options = {
             "bind": f"{self.host}:{self.port}",
