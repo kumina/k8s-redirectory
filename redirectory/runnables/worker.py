@@ -1,15 +1,21 @@
+from threading import Thread
+
 from kubi_ecs_logger import Logger, Severity
 
 from .runnable_service import RunnableService
 from redirectory.libs_int.hyperscan import HsManager
 from redirectory.libs_int.service import NamespaceManager
+from redirectory.libs_int.sync import Synchronizer
 
 
 class WorkerService(RunnableService):
 
     def run(self):
-        # Load hyperscan database
-        HsManager().database.load_database()
+        # Start loading hyperscan database from management if it exists
+        sync = Synchronizer()
+
+        sync_thread = Thread(name="sync worker thread", target=sync.worker_sync_files)
+        sync_thread.start()
 
         # Add the redirect
         from redirectory.services import WorkerRedirect

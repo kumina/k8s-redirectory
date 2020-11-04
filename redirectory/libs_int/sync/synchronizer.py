@@ -94,6 +94,9 @@ class Synchronizer:
 
         # Download sync files and write to disc
         sync_zip_file = self.management_get_sync_files()
+        if sync_zip_file is None:
+            return
+
         self.util_save_sync_zip_file(sync_zip_file)
 
         # Reload sql
