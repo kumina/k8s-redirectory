@@ -1,5 +1,4 @@
 from abc import ABC
-from threading import Thread
 from flask import Flask, request, Response
 
 from kubi_ecs_logger import Logger, Severity
@@ -93,9 +92,7 @@ class RunnableService(Runnable, ABC):
         if is_worker:
             # Start loading hyperscan database from management if it exists
             sync = Synchronizer()
-
-            sync_thread = Thread(name="sync worker thread", target=sync.worker_sync_files)
-            sync_thread.start()
+            sync.worker_sync_files()
 
         service_options = {
             "bind": f"{self.host}:{self.port}",
