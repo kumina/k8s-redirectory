@@ -1,4 +1,5 @@
 import os
+import threading
 from typing import Optional
 
 from sqlalchemy import create_engine
@@ -7,6 +8,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from kubi_ecs_logger import Logger, Severity
 
 from redirectory.libs_int.config.configuration import Configuration
+
+
+def get_current_thread_id() -> Optional[int]:
+    """
+    Returns the ID of the thread where the function was called
+    """
+    return threading.current_thread().ident
 
 
 def get_connection_string():
@@ -38,7 +46,7 @@ class DatabaseManager:
     __initialized: bool = False
     __base = None
 
-    __session = None
+    __sessions: dict = {}
     __session_maker = None
 
     def __new__(cls):
@@ -50,6 +58,7 @@ class DatabaseManager:
             cls.__instance.__base = declarative_base(bind=cls.__instance.__engine)
 
             cls.__instance.__session_maker = sessionmaker(expire_on_commit=True, autoflush=True)
+            cls.__instance.__sessions = {}
             cls.__initialized = True
 
             Logger().event(
@@ -76,22 +85,35 @@ class DatabaseManager:
             a database session for the current thread
         """
         if self.__initialized:
-            if self.__session is None:
-                self.__session = scoped_session(self.__session_maker)
-            return self.__session
+            # Get thread id
+            thread_id = get_current_thread_id()
+
+            # Check if we already have a session for this thread
+            if thread_id in self.__sessions.keys():
+                if self.__sessions[thread_id] is None:
+                    self.__sessions[thread_id] = scoped_session(self.__session_maker)
+            else:
+                self.__sessions[thread_id] = scoped_session(self.__session_maker)
+
+            return self.__sessions[thread_id]
         else:
             raise ValueError("DatabaseManager must be initialized!")
 
     def return_session(self, session):
         """
         Closes the given session and removes it from DatabaseManager to prevent from any further use.
+        The function will call remove() on the passed in session and will null out the session in the
+        self.__sessions dict corresponding to the thread id the function is getting called in.
         Sets the session of the DatabaseManager to None
 
         Args:
             session: the session to remove
         """
         session.remove()
-        self.__session = None
+        # Get thread id
+        thread_id = get_current_thread_id()
+        if thread_id in self.__sessions:
+            self.__sessions[thread_id] = None
 
     def get_base(self):
         """

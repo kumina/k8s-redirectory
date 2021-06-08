@@ -8,6 +8,7 @@ settings.ini
 conf/settings.ini
 conf/config.yaml
 _build/
+.vscode/
 
 # C extensions
 *.so
