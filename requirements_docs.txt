@@ -15,7 +15,7 @@ hyperscan==0.1.1
 idna==2.8
 imagesize==1.1.0
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jsonschema==2.6.0
 kubernetes==9.0.0
 kubi-ecs-logger==0.0.5
@@ -27,14 +27,14 @@ packaging==19.0
 prometheus-client==0.6.0
 pyasn1==0.4.5
 pyasn1-modules==0.2.5
-Pygments==2.4.0
+Pygments==2.7.4
 pyparsing==2.4.0
 python-dateutil==2.8.0
 pytz==2018.9
-PyYAML==5.1
+PyYAML==5.4
 requests==2.21.0
 requests-oauthlib==1.2.0
-rsa==4.0
+rsa==4.1
 six==1.12.0
 snowballstemmer==1.2.1
 Sphinx==2.0.1
